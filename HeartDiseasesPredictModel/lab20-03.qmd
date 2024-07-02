@@ -1,0 +1,94 @@
+---
+title: "Um estudo sobre doenças do coração"
+author: "Guilherme Toffoli"
+lang: pt
+date: today
+format: html
+editor: visual
+---
+
+## Introdução
+
+Neste projeto iremos analisar informações sobre pacientes que podem ter alguma doença no coraçao. O conjunto de dados foi obtido no repositório UC Irvine Machine Learning e contém dados sobre idade, sexo, colesterol, dor no peito, ausencia ou presença de doença no coração dentre outras variáveis. Na primeira parte iremos descrever os dados e na parte final propuseremos o modelo.
+
+## Conhecendo os dados
+
+A seguir importaremos os pacotes que serão necessários para realizar este projeto.
+
+```{r}
+#| warning: false
+library(ggplot2) #Gerar gráficos
+library(rpart) #Modelagem
+library(rpart.plot) #Gráfico do modelo
+
+```
+
+Agora vamos importar o conjunto de dados
+
+```{r}
+#| echo: false
+dados <- read.csv("/Users/Guilherme/Downloads/heart.csv")
+
+```
+
+Dados
+
+```{r}
+str(dados)
+```
+
+Transformando as variáveis em categóricas
+
+```{r}
+dados[,c(2,3,6,7,9,11,12,13,14)] <- lapply(dados[,c(2,3,6,7,9,11,12,13,14)], factor)
+str(dados)
+```
+
+Com tudo certo, agora iremos analisar graficamente o conjunto
+
+```{r}
+#| fig-align: center
+#| echo: false
+ggplot(data = dados, aes(x = target)) + geom_bar() + theme_minimal()
+```
+
+```{r}
+#| fig-align: center
+#| echo: false
+ggplot(data = dados, aes(x = target, fill = sex)) + geom_bar() + theme_minimal()
+```
+
+```{r}
+#| fig-align: center
+#| echo: false
+ggplot(data = dados, aes(x = cp, fill = target)) + geom_bar() + theme_minimal()
+```
+
+## Criando um modelo preditivo
+
+Nesta seção iremos fazer um modelo baseado em árvore, embaralhando e separando o conjunto de dados em treino, 80% dos dados e teste, 20% restantes, a fim de não viciar os resultados finais. Após estes passos, cria-se o modelo com relação das respostas (target) em função das outras variáveis presentes no conjunto. No passo seguinte, faz-se uma media da previsao com os resultados para averiguar a porcentagem de sucesso.
+
+```{r}
+#| fig-align: center
+#| echo: false
+
+dados <- dados[sample(nrow(dados)),]
+
+n <- round(0.8*nrow(dados))
+
+treino <- dados[1:n,]
+teste <- dados[-(1:n),]
+
+arvore.heart <- rpart(formula = target ~ ., data = treino)
+
+rpart.plot(arvore.heart, extra = 101)
+
+previsao <- predict(arvore.heart, newdata = teste, type = "class")
+mean(previsao == teste$target)
+```
+
+Tabela cruzada com o que foi modelado com o que realmente é.
+
+```{r}
+table(previsao, teste$target)
+```

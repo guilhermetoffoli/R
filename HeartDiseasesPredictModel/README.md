@@ -1,0 +1,1 @@
+This is a study of heart diseases using the repository of UC Irvine Machine Learning, which contains data of people such as age, sex, colesterol, chest pain and etc. The Objective of this project is to build a tree predictive model, using quarto to render a html and R language.
